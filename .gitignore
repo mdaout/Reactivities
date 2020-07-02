@@ -1,3 +1,11 @@
+/node_modules
+/.pnp
+.pnp.json
+/coverage
+/build
+
+nmp-debug.log.*
+
 bin
 obj
 .vscode
