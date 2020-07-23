@@ -1,21 +1,17 @@
-import React, { SyntheticEvent } from 'react'
+import React, { useContext } from 'react'
 import { Item, Button, Label, Segment } from 'semantic-ui-react'
-import { IActivity } from '../../../app/models/Activity';
+import { observer } from 'mobx-react-lite';
+import ActivityStore from '../../../app/stores/activitystore';
 
-interface IProps {
+export const ActivityList: React.FC = () => {
 
-    activities: IActivity[]
-    selectActvitiy : (id : string) => void
-    deleteActivity: (event: SyntheticEvent<HTMLButtonElement>, id: string) => void;
-    submitting: boolean;
-    target : String;
-}
+    const activityStore = useContext(ActivityStore);
+    const {ActivitiesByDate, selectActivity, deleteActivity, submitting,target} = activityStore;
 
-export const ActivityList: React.FC<IProps> = ({ activities, selectActvitiy, deleteActivity,submitting, target  }) => {
     return (
         <Segment clearing>
             <Item.Group divided>
-                {activities.map(activity => (
+                {ActivitiesByDate.map(activity => (
                     <Item key={activity.id}>
                         <Item.Content>
                             <Item.Header as='a'>{activity.title}</Item.Header>
@@ -26,7 +22,7 @@ export const ActivityList: React.FC<IProps> = ({ activities, selectActvitiy, del
                             </Item.Description>
                             <Item.Extra>
                                 <Button 
-                                onClick={() => selectActvitiy(activity.id)}
+                                onClick={() => selectActivity(activity.id)}
                                 floated='right' content='View' color='blue' />
 
                                 <Button name={activity.id} loading={target === activity.id && submitting} 
@@ -37,13 +33,9 @@ export const ActivityList: React.FC<IProps> = ({ activities, selectActvitiy, del
                         </Item.Content>
                     </Item>
                 ))}
-
-
             </Item.Group>
-
         </Segment>
-
     )
 }
 
-export default ActivityList
+export default observer (ActivityList);
