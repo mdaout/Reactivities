@@ -1,37 +1,31 @@
-import React, { useContext } from 'react'
- 
+import React, { useContext, useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
 import ActivityList from './ActivityList';
-import ActivityDetails from '../details/ActivityDetails';
-import ActivityForm from '../forms/ActivityForm';
-
-import {observer} from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import ActivityStore from '../../../app/stores/activitystore';
+import LoadingComponent from '../../../app/layout/LoadingComponent';
 
+const ActivityDashboard: React.FC = () => {
 
-
-export const ActivityDashboard: React.FC = () => {
   const activityStore = useContext(ActivityStore);
-  const {editMode, selectedActivity} = activityStore;
-    return (
-        <Grid>
-            <Grid.Column width={10}>
-                <ActivityList />
-            </Grid.Column>
-            <Grid.Column width={6}>
-                {selectedActivity && !editMode && (
-                    <ActivityDetails />)}
 
-                {/* // below when we give the form a key and the key chnges an intitial occurs 
-         // selectedActivity  this test for existense or not null */}
-                {editMode && <ActivityForm
-                // eslint-disable-next-line
-                    key={selectedActivity && selectedActivity.id || 0}
-                    activity={selectedActivity!}
-                    />}
-            </Grid.Column>
-        </Grid>
-    )
-}
+  useEffect(() => {
+    activityStore.loadActivities();
+  }, [activityStore]);
+
+  if (activityStore.loadingInitial)
+    return <LoadingComponent content='Loading activities' />;
+
+  return (
+    <Grid>
+      <Grid.Column width={10}>
+        <ActivityList />
+      </Grid.Column>
+      <Grid.Column width={6}>
+        <h2>Activity filters</h2>
+      </Grid.Column>
+    </Grid>
+  );
+};
 
 export default observer(ActivityDashboard);
