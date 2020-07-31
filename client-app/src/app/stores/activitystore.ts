@@ -3,7 +3,7 @@ import { createContext, SyntheticEvent } from 'react';
 import { IActivity } from '../models/Activity';
 import agent from '../api/agent';
 
-configure({enforceActions: 'always'});
+configure({ enforceActions: 'always' });
 
 class ActivityStore {
   @observable activityRegistry = new Map();
@@ -13,9 +13,21 @@ class ActivityStore {
   @observable target = '';
 
   @computed get activitiesByDate() {
-    return Array.from(this.activityRegistry.values()).sort(
+    // return Array.from(this.activityRegistry.values()).sort(
+    //   (a, b) => Date.parse(a.date) - Date.parse(b.date)
+    // );
+      return this.groupActivitiesByDate(Array.from(this.activityRegistry.values()));
+  }
+
+  groupActivitiesByDate(activities: IActivity[]) {
+    const sortedActities = activities.sort(
       (a, b) => Date.parse(a.date) - Date.parse(b.date)
-    );
+    )
+    return Object.entries(sortedActities.reduce((activities, activity) => {
+      const date = activity.date.split('T')[0]; 
+      activities[date] = activities[date]  ? [...activities[date], activity] : [activity];
+      return activities;
+    }, {} as {[key: string] : IActivity[]}));
   }
 
   @action loadActivities = async () => {
@@ -29,7 +41,7 @@ class ActivityStore {
         });
         this.loadingInitial = false;
       })
-
+      console.log(this.groupActivitiesByDate(activities));
     } catch (error) {
       runInAction('load activities error', () => {
         this.loadingInitial = false;
@@ -45,7 +57,7 @@ class ActivityStore {
       this.loadingInitial = true;
       try {
         activity = await agent.Activities.details(id);
-        runInAction('getting activity',() => {
+        runInAction('getting activity', () => {
           this.activity = activity;
           this.loadingInitial = false;
         })
