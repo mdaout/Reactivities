@@ -6,7 +6,7 @@ namespace Domain
     {
         public string DisplayName { get; set; }
 
-     // public string DODId { get; set; }
+        public string DODId { get; set; }
         
     }
 }

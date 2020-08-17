@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Persistence
 {
-    public class Seed : IdentityDbContext<AppUser>
+  //  public class Seed : IdentityDbContext<AppUser>
+      public class Seed  
     {
         public static async Task SeedData(DataContext context, UserManager<AppUser> userManager)
         //  public static void  SeedData(DataContext context)
