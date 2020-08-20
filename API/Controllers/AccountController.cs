@@ -44,8 +44,8 @@ namespace API.Controllers
         }
   
         [HttpPost("login")]
-        // public async Task<ActionResult<User>> Login(LoginTo login)
-            public async Task<ActionResult<AppUser>> Login(LoginTo login)
+        public async Task<ActionResult<User>> Login(LoginTo login)
+       //     public async Task<ActionResult<AppUser>> Login(LoginTo login)
         {
             AppUser appUser = await _userManager.FindByEmailAsync(login.Email);
             if (appUser != null)
@@ -54,15 +54,14 @@ namespace API.Controllers
            .CheckPasswordSignInAsync(appUser, login.Password, false);
                 if (result.Succeeded)
                 {
-                    return appUser;
+                 //   return appUser;
                     // TODO: generate token
-                    // return new User
-                    // {
-
-                    //     DisplayName = appUser.DisplayName,
-                    //     Token = _jwtGenerator.CreateToken(appUser),
-                    //     UserName = appUser.UserName
-                    // };
+                    return new User
+                    {
+                        DisplayName = appUser.DisplayName,
+                        Token = _jwtGenerator.CreateToken(appUser),
+                        UserName = appUser.UserName
+                    };
                 }
             }
             return NotFound();
