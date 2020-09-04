@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
-using static Application.User.RegisterUser;
+using Domain;
+//using static Application.User.RegisterUser;
 
 namespace Application.Interfaces
 {

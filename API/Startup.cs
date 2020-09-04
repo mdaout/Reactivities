@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using AutoMapper;
 
 namespace API
 {
@@ -39,10 +40,20 @@ namespace API
             //     options.UseSqlServer(
             //         Configuration.GetConnectionString("DefaultConnection")));
 
+           services.AddDbContext<DataContext>(options =>
+             {
+                 options.UseLazyLoadingProxies();        // For Lazy Loading Microsoft.EntityFrameworkCore.Proxies
+                 options.UseSqlite(
+                  Configuration.GetConnectionString("DefaultConnection"));
+             });
 
-            services.AddDbContext<DataContext>(options =>
-               options.UseSqlite(
-                   Configuration.GetConnectionString("DefaultConnection")));
+            // //  services.AddDbContext<DataContext>(options =>
+            // //  {
+            // //      options.UseLazyLoadingProxies();        // For Lazy Loading Microsoft.EntityFrameworkCore.Proxies
+            // //      options.UseSqlServer(
+            // //       Configuration.GetConnectionString("Default"));
+            // //  });
+
 
             services.AddCors(opt =>
            opt.AddPolicy("CorsPloicy", policy =>
@@ -52,8 +63,8 @@ namespace API
             );
 
             services.AddMediatR(typeof(List.Handler).Assembly);
-            
-          //  services.AddMediatR(typeof(Login.Handler).Assembly);
+            services.AddAutoMapper(typeof(List.Handler));
+            //  services.AddMediatR(typeof(Login.Handler).Assembly);
             // services.AddControllers().AddFluentValidation( cfg =>
             // {
             //     cfg.RegisterValidatorsFromAssemblyContaining<Create>();
@@ -63,10 +74,13 @@ namespace API
             {
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                 opt.Filters.Add(new AuthorizeFilter(policy));
-            }).AddFluentValidation( cfg =>
-            {
-                cfg.RegisterValidatorsFromAssemblyContaining<Create>();
-            });
+            }).AddFluentValidation(cfg =>
+           {
+               cfg.RegisterValidatorsFromAssemblyContaining<Create>();
+           });
+            //    .AddNewtonsoftJson(options =>
+            //        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            //    );
 
             // var builder = services.AddIdentityCore<AppUser>();
             // var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
@@ -78,39 +92,48 @@ namespace API
             var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
             identityBuilder.AddEntityFrameworkStores<DataContext>();
             identityBuilder.AddSignInManager<SignInManager<AppUser>>();
-                       
 
-             
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
-             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt =>
+            services.AddAuthorization(opt =>
+             {
+                opt.AddPolicy("IsActivityHost", policy =>
                 {
-                    opt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = key,
-                        ValidateAudience = false,
-                        ValidateIssuer = false
-                    };
+                    policy.Requirements.Add(new IsHostRequirement());
                 });
+             });
+            services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
-              services.AddScoped<IJwtGenerator, JwtGenerator>();
-              services.AddScoped<IUserAccessor, UserAccessor>();
-           //   services.AddScoped<IRegisterUser, RegisterUser2>();
-           // services.AddDefaultIdentity<AppUser>().AddEntityFrameworkStores<DataContext>();
-  
-           
+
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+               .AddJwtBearer(opt =>
+               {
+                   opt.TokenValidationParameters = new TokenValidationParameters
+                   {
+                       ValidateIssuerSigningKey = true,
+                       IssuerSigningKey = key,
+                       ValidateAudience = false,
+                       ValidateIssuer = false
+                   };
+               });
+
+            services.AddScoped<IJwtGenerator, JwtGenerator>();
+            services.AddScoped<IUserAccessor, UserAccessor>();
+            //   services.AddScoped<IRegisterUser, RegisterUser2>();
+            // services.AddDefaultIdentity<AppUser>().AddEntityFrameworkStores<DataContext>();
+
+
         }
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-         app.UseMiddleware<ErrorHandlingMiddleware>();
-          
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+
             if (env.IsDevelopment())
             {
-            //   app.UseDeveloperExceptionPage();
+                //   app.UseDeveloperExceptionPage();
             }
 
             // app.UseHttpsRedirection();

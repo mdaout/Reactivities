@@ -28,7 +28,7 @@ namespace Application.User
                 _jwtGenerator = jwtGenerator;
             }
 
-            public async Task<User> AddIt (RegisterUser2.AddUser request)
+            public async Task<User> AddIt (AddUser request)
             {
                 if (await _context.Users.Where(x => x.Email == request.Email).AnyAsync())
                 {
@@ -60,31 +60,31 @@ namespace Application.User
                 throw new Exception("Problem adding record");
             }
 
-        public Task<User> AddIt(RegisterUser.AddUser request)
-        {
-            throw new NotImplementedException();
-        }
+        // public Task<User> AddIt(RegisterUser.AddUser request)
+        // {
+        //     throw new NotImplementedException();
+        // }
 
-        public class AddUser 
-        {
-            public string DisplayName { get; set; }
-            public string UserName { get; set; }
-            public string Email { get; set; }
-            public string Password { get; set; }
+        // public class AddUser 
+        // {
+        //     public string DisplayName { get; set; }
+        //     public string UserName { get; set; }
+        //     public string Email { get; set; }
+        //     public string Password { get; set; }
 
-            // Properites go here 
-        }
+        //     // Properites go here 
+        // }
 
-        public class QueryValidator : AbstractValidator<AddUser>
-        {
-            public QueryValidator()
-            {
-                RuleFor(x => x.DisplayName).NotEmpty();
-                RuleFor(x => x.UserName).NotEmpty();
-                RuleFor(x => x.Email).NotEmpty();
-                RuleFor(x => x.Password).NotEmpty();
-            }
-        }
+        // public class QueryValidator : AbstractValidator<AddUser>
+        // {
+        //     public QueryValidator()
+        //     {
+        //         RuleFor(x => x.DisplayName).NotEmpty();
+        //         RuleFor(x => x.UserName).NotEmpty();
+        //         RuleFor(x => x.Email).NotEmpty();
+        //         RuleFor(x => x.Password).NotEmpty();
+        //     }
+        // }
        
         }
 }

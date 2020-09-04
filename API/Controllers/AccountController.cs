@@ -67,7 +67,7 @@ namespace API.Controllers
             return NotFound();
         }
           [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(RegisterUser.AddUser  command)
+        public async Task<ActionResult<User>> Register(AddUser command)
         {
         //     var sender = new RegisterUser.insertUser(_context, _userManager, _jwtGenerator );
         //    return await sender.AddIt(command); 
