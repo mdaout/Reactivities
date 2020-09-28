@@ -7,9 +7,13 @@ namespace Domain
     {
         public string DisplayName { get; set; }
 
+        public string Bio { get; set; }
+
         public string DODId { get; set; }
 
        // public ICollection<UserActivity> UserActivities { get; set; }   // Before Lazy Loading 
          public virtual ICollection<UserActivity> UserActivities { get; set; } 
+
+         public virtual ICollection<Photo> Photos { get; set; } 
     }
 }
